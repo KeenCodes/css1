@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flappy Bird</title>
+<style type="text/css">
+	body{
+		background-color:black;  
+	}
+    #bird{
+        background: url('bird.png');
+        background-repeat: no-repeat;
+		background-position: center;
+		background-size: cover;
+		height: 50px;
+		width: 50px;
+		position:absolute;
+    }
+    #pipebot{
+        background: url('pipebot.png');
+        background-repeat: no-repeat;
+		background-position: center;
+		background-size: contain;
+		height: 600px;
+		width: 80px;
+		position:absolute;
+    }
+    #pipetop{
+        background: url('pipetop.png');
+        background-repeat: no-repeat;
+		background-position: center;
+		background-size: contain;
+		height: 600px;
+		width: 80px;
+		position:absolute;
+    }
+    #score{
+        font-size: 70px;
+        color:white;
+        position:absolute;
+    }
+    #container{
+        background-color: skyblue;
+        width:900px;
+		height:550px;
+        overflow: hidden;
+        position: relative;
+    }
+</style>
+</head>
+    <div id = 'container'>
+    <div id = 'bird' style = 'top: 200px; left: 200px; '></div>
+    <div id = 'pipes'></div>
+    <div id = 'score' style = 'top: 20px; left: 430px; '>0</div>
+    </div>
+
+<script>
+    var jumpSound = new Audio("wing.mp3");
+    var scoreSound = new Audio("point.mp3");
+    var scoreTag = true;
+    var score = 0;
+    var bird = {
+        x:300,
+        y:200
+    }
+    
+    var pipes = [{x:900, y:Math.floor((Math.random() * (-550-(-200)) + (-200)))},
+    {x:1200, y:Math.floor((Math.random() * (-550-(-200)) + (-200)))},
+    {x:1500, y:Math.floor((Math.random() * (-550-(-200)) + (-200)))}];
+
+    var jump = false;
+    var jumpTime = 0;
+    
+    function displayBird(){
+        document.getElementById('bird').style.top = bird.y+'px';
+        document.getElementById('bird').style.left = bird.x+'px';
+    }
+    function displayPipe(){
+        var output = '';
+        for(var i=0; i<pipes.length; i++){
+        output +="<div id = 'pipetop' style = 'top: "+pipes[i].y+"px; left: "+pipes[i].x+"px;'></div>";
+        output +="<div id = 'pipebot' style = 'top: "+(pipes[i].y+700)+"px; left: "+pipes[i].x+"px;'></div>";
+        }
+        document.getElementById('pipes').innerHTML=output;
+    }
+
+    function movePipe(){
+        for(var i=0; i<pipes.length; i++){
+        pipes[i].x--;
+            if(pipes[i].x < 0){
+            pipes[i].x = 900;
+            pipes[i].y = Math.floor((Math.random() * (-450-(-250)) + (-250)));
+            scoreTag = true;
+            }
+        }
+       
+    }
+    
+    function collision(){
+        for(var i=0; i<pipes.length; i++){
+            if(Math.abs(pipes[i].x - bird.x)<50 && Math.abs(pipes[i].y - bird.y) <580){
+                location.reload();
+            }else if(Math.abs(pipes[i].x - bird.x)<50 && Math.abs(pipes[i].y+100 - bird.y) >580){
+                location.reload(); 
+                
+            } 
+        }
+    }   
+
+    function displayScore(){
+        document.getElementById('score').innerHTML=score;
+        for(var i=0; i<pipes.length; i++){
+        if(Math.abs(pipes[i].x - bird.x)<60 && Math.abs(pipes[i].y - bird.y) >580){
+                if(scoreTag == true){
+                score++;
+                scoreSound.play(); 
+                }
+                scoreTag = false;
+            }
+        }
+    }
+    function deads(){
+        if(bird.y > 550){
+            location.reload();
+        }
+    }
+  
+    function gravity(){
+        if(jump == true && jumpTime < 50){
+        bird.y --;
+        jumpTime ++;
+        }else if(jumpTime >= 50){
+            jump = false;
+            jumpTime = 0;
+        }else
+        bird.y +=2;
+    }
+    function gameLoop(){
+        gravity();
+        displayBird();
+        movePipe();
+        displayPipe();
+        collision()
+        displayScore();
+        deads();
+        
+
+    }
+
+    setInterval(gameLoop,5);
+
+    document.onkeydown = function(e){
+        if(e.keyCode == 32){
+            jump = true;
+            jumpTime = 0; 
+            bird.y -= 10; 
+            jumpSound.play();   
+        } 
+    }
+
+
+</script>
+
+
+
+<body>
+
+</body>
+
+</html>
